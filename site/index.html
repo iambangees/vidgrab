@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VidGrab — paste a link, keep the video</title>
+<meta name="description" content="Download videos from YouTube, X, TikTok and Facebook links — powered by your own private server, so nothing passes through strangers' ad machines.">
+<meta property="og:title" content="VidGrab — paste a link, keep the video">
+<meta property="og:description" content="A video downloader front-end that talks to a small server you own. YouTube, X, TikTok, Facebook.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="banner.png">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root { --bg:#131417; --card:#1d1f24; --line:#33363e; --text:#f4f4f6; --muted:#a7abb8; --accent:#ff4d5e; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background:var(--bg); color:var(--text); }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 26px 16px 56px; }
+  h1 { font-size: 33px; margin: 4px 0 2px; }
+  h1 .dot { color: var(--accent); }
+  .tag { color: var(--muted); margin: 0 0 18px; line-height: 1.55; }
+  .hero-img { width:100%; border-radius:16px; border:1px solid var(--line); display:block; margin-bottom: 18px; }
+  .card { background: var(--card); border:1px solid var(--line); border-radius: 16px; padding: 18px; margin-top: 14px; }
+  .paste { display:flex; gap: 8px; flex-wrap: wrap; }
+  .paste input { flex: 1; min-width: 220px; background:#0e0f11; color:var(--text); border:1px solid var(--line); border-radius: 10px; padding: 13px 14px; font-size: 15.5px; }
+  button.act { background: var(--accent); color:#fff; border:0; border-radius: 10px; padding: 13px 20px; font-size: 15.5px; font-weight: 700; cursor:pointer; }
+  button.ghost { background: transparent; color: var(--text); border:1px solid var(--line); border-radius: 10px; padding: 10px 15px; font-size: 14px; font-weight: 600; cursor:pointer; }
+  .plats { display:flex; gap:8px; flex-wrap: wrap; margin-top: 12px; }
+  .plat { border:1px solid var(--line); color:var(--muted); border-radius: 999px; padding: 5px 12px; font-size: 13px; }
+  .plat.on { color:#fff; border-color: var(--accent); background: rgba(255,77,94,.15); }
+  .note { color: var(--muted); font-size: 13.5px; line-height: 1.65; }
+  .note b { color: var(--text); }
+  .thumb { width: 100%; border-radius: 10px; display:block; }
+  .fmt { display:flex; justify-content: space-between; align-items:center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14.5px; }
+  .fmt:last-child { border-bottom: 0; }
+  .err { color: #ff8a7a; }
+  .hidden { display:none; }
+  input.server { width: 100%; background:#0e0f11; color:var(--text); border:1px solid var(--line); border-radius: 10px; padding: 11px 13px; font-size: 14px; margin-top: 8px; }
+  ol.steps { line-height: 1.8; font-size: 14.5px; padding-left: 18px; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>VidGrab<span class="dot">.</span></h1>
+  <p class="tag">Paste a link from YouTube, X, TikTok or Facebook and download the video to your device — through a small server <b>you</b> own, not a stranger's ad farm.</p>
+  <img class="hero-img" src="banner.png" alt="VidGrab — paste a link, keep the video">
+
+  <div class="card">
+    <div class="paste">
+      <input type="url" id="url" placeholder="Paste a video link here…">
+      <button class="act" id="btnFetch">Fetch video</button>
+    </div>
+    <div class="plats" id="plats">
+      <span class="plat" data-p="youtube">YouTube</span>
+      <span class="plat" data-p="x">X / Twitter</span>
+      <span class="plat" data-p="tiktok">TikTok</span>
+      <span class="plat" data-p="facebook">Facebook</span>
+      <span class="plat" data-p="instagram">Instagram</span>
+    </div>
+    <p class="note" id="status" style="margin-top:12px"></p>
+  </div>
+
+  <div class="card hidden" id="resultCard">
+    <img class="thumb" id="thumb" alt="Video thumbnail">
+    <h3 id="vtitle" style="margin:12px 0 2px"></h3>
+    <p class="note" id="vdur"></p>
+    <div id="formats"></div>
+    <p class="note">Tip: the MP4 options play everywhere. "Best" merges video+audio on the server when needed.</p>
+  </div>
+
+  <div class="card" id="serverCard">
+    <h3 style="margin:2px 0 6px">⚙ Your download server</h3>
+    <p class="note">Browsers can't pull videos off those platforms directly — a tiny server does the fetching (it's in this project's repo, ~10 minutes to deploy free on Render or Railway, or run it on your own computer). Paste its address here once and this page is fully yours.</p>
+    <input class="server" id="serverUrl" placeholder="https://your-vidgrab-server.onrender.com">
+    <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap">
+      <button class="ghost" id="btnSaveServer">Save server</button>
+      <button class="ghost" id="btnTestServer">Test connection</button>
+    </div>
+    <p class="note" id="serverStatus" style="margin-top:8px"></p>
+    <ol class="steps">
+      <li>Open the <a href="https://github.com/iambangees/vidgrab" target="_blank" rel="noopener">VidGrab repo</a> → the <b>server/</b> folder has everything, including a Dockerfile.</li>
+      <li>Deploy it free: Render → New → Web Service → point it at the repo's server folder (Docker) → Deploy.</li>
+      <li>Copy the service URL, paste it above, save. Done — fetch away.</li>
+    </ol>
+  </div>
+
+  <p class="note" style="margin-top:18px"><b>Fair use, plainly:</b> only download videos you own, that are yours to keep (Creative Commons, public domain, your own uploads), or where the platform offers saving. Respect creators and each platform's terms. VidGrab's page code is open; the server runs on your account and under your control. Built by Bangees.</p>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const server = () => (localStorage.getItem("vidgrab-server") || "").replace(/\/$/, "");
+$("serverUrl").value = server();
+
+const PLATFORMS = [
+  ["youtube", /(youtube\.com|youtu\.be)/i], ["x", /(twitter\.com|x\.com)/i], ["tiktok", /tiktok\.com/i],
+  ["facebook", /(facebook\.com|fb\.watch)/i], ["instagram", /instagram\.com/i]
+];
+function detect(u) { for (const [name, re] of PLATFORMS) if (re.test(u)) return name; return null; }
+$("url").addEventListener("input", () => {
+  const p = detect($("url").value);
+  document.querySelectorAll(".plat").forEach(el => el.classList.toggle("on", el.dataset.p === p));
+});
+
+$("btnSaveServer").onclick = () => { localStorage.setItem("vidgrab-server", $("serverUrl").value.trim()); $("serverStatus").textContent = "Saved ✓"; };
+$("btnTestServer").onclick = async () => {
+  const s = server(); if (!s) { $("serverStatus").innerHTML = '<span class="err">Save a server address first.</span>'; return; }
+  $("serverStatus").textContent = "Testing…";
+  try { const r = await fetch(s + "/health"); const d = await r.json(); $("serverStatus").textContent = d.ok ? "Connected ✓ — server is alive." : "The server answered but not as expected."; }
+  catch (e) { $("serverStatus").innerHTML = '<span class="err">Could not reach that server. Check the address and that it is deployed.</span>'; }
+};
+
+$("btnFetch").onclick = async () => {
+  const u = $("url").value.trim();
+  const s = server();
+  if (!u) { $("status").innerHTML = '<span class="err">Paste a video link first.</span>'; return; }
+  if (!detect(u)) { $("status").innerHTML = '<span class="err">That link is not from YouTube, X, TikTok, Facebook or Instagram.</span>'; return; }
+  if (!s) { $("status").innerHTML = '<span class="err">No download server connected yet — set yours up below (one-time, ~10 minutes), then this works fully.</span>'; $("serverCard").scrollIntoView({ behavior: "smooth" }); return; }
+  $("status").textContent = "Asking your server about that video…";
+  $("resultCard").classList.add("hidden");
+  try {
+    const r = await fetch(`${s}/api/info?url=${encodeURIComponent(u)}`);
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error || "server error");
+    $("status").textContent = "";
+    $("thumb").src = d.thumbnail || "";
+    $("vtitle").textContent = d.title || "Untitled video";
+    $("vdur").textContent = d.duration ? `Duration: ${Math.floor(d.duration / 60)}:${String(d.duration % 60).padStart(2, "0")}` : "";
+    $("formats").innerHTML = d.formats.map(f =>
+      `<div class="fmt"><span>${f.label}</span><button class="ghost" data-f="${f.id}">Download</button></div>`).join("");
+    $("formats").querySelectorAll("button").forEach(b => b.onclick = () => {
+      window.location.href = `${s}/api/download?url=${encodeURIComponent(u)}&format=${encodeURIComponent(b.dataset.f)}`;
+    });
+    $("resultCard").classList.remove("hidden");
+    $("resultCard").scrollIntoView({ behavior: "smooth" });
+  } catch (e) {
+    $("status").innerHTML = `<span class="err">Your server could not fetch that video (${e.message}). The post may be private, age-gated, or the platform may be rate-limiting.</span>`;
+  }
+};
+</script>
+</body>
+</html>

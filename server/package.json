@@ -1,0 +1,1 @@
+{"dependencies":{"cors":"^2.8.5","express":"^4.19.2"},"description":"VidGrab download server — a tiny yt-dlp wrapper you deploy yourself.","main":"server.js","name":"vidgrab-server","private":true,"scripts":{"start":"node server.js"},"version":"1.0.0"}
