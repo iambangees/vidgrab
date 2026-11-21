@@ -69,18 +69,18 @@
   </div>
 
   <div class="card" id="serverCard">
-    <h3 style="margin:2px 0 6px">⚙ Your download server</h3>
-    <p class="note">Browsers can't pull videos off those platforms directly — a tiny server does the fetching (it's in this project's repo, ~10 minutes to deploy free on Render or Railway, or run it on your own computer). Paste its address here once and this page is fully yours.</p>
-    <input class="server" id="serverUrl" placeholder="https://your-vidgrab-server.onrender.com">
+    <h3 style="margin:2px 0 6px">⚙ Download server</h3>
+    <p class="note">Browsers can't pull videos off those platforms directly — a tiny server does the fetching. This page comes pre-connected to the project's own server, so downloads work straight away (first fetch after a quiet spell can take ~30–60 seconds while the free server wakes up). Prefer running your own? The server code is in this project's repo — deploy it and paste its address here instead.</p>
+    <input class="server" id="serverUrl" placeholder="Pre-connected — only change this to use your own server">
     <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap">
       <button class="ghost" id="btnSaveServer">Save server</button>
       <button class="ghost" id="btnTestServer">Test connection</button>
     </div>
     <p class="note" id="serverStatus" style="margin-top:8px"></p>
     <ol class="steps">
-      <li>Open the <a href="https://github.com/iambangees/vidgrab" target="_blank" rel="noopener">VidGrab repo</a> → the <b>server/</b> folder has everything, including a Dockerfile.</li>
+      <li><b>To run your own server:</b> open the <a href="https://github.com/iambangees/vidgrab" target="_blank" rel="noopener">VidGrab repo</a> → the <b>server/</b> folder has everything, including a Dockerfile.</li>
       <li>Deploy it free: Render → New → Web Service → point it at the repo's server folder (Docker) → Deploy.</li>
-      <li>Copy the service URL, paste it above, save. Done — fetch away.</li>
+      <li>Copy the service URL, paste it above, save. The page will use yours instead of the built-in one.</li>
     </ol>
   </div>
 
@@ -89,7 +89,8 @@
 
 <script>
 const $ = (id) => document.getElementById(id);
-const server = () => (localStorage.getItem("vidgrab-server") || "").replace(/\/$/, "");
+const DEFAULT_SERVER = "https://vidgrab-server-139k.onrender.com";
+const server = () => (localStorage.getItem("vidgrab-server") || DEFAULT_SERVER).replace(/\/$/, "");
 $("serverUrl").value = server();
 
 const PLATFORMS = [
@@ -115,7 +116,7 @@ $("btnFetch").onclick = async () => {
   const s = server();
   if (!u) { $("status").innerHTML = '<span class="err">Paste a video link first.</span>'; return; }
   if (!detect(u)) { $("status").innerHTML = '<span class="err">That link is not from YouTube, X, TikTok, Facebook or Instagram.</span>'; return; }
-  if (!s) { $("status").innerHTML = '<span class="err">No download server connected yet — set yours up below (one-time, ~10 minutes), then this works fully.</span>'; $("serverCard").scrollIntoView({ behavior: "smooth" }); return; }
+  if (!s) { $("status").innerHTML = '<span class="err">No download server is set — check the server card below.</span>'; $("serverCard").scrollIntoView({ behavior: "smooth" }); return; }
   $("status").textContent = "Asking your server about that video…";
   $("resultCard").classList.add("hidden");
   try {
