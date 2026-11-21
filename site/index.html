@@ -38,6 +38,10 @@
   ol.steps { line-height: 1.8; font-size: 14.5px; padding-left: 18px; }
   a { color: var(--accent); }
 </style>
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1d1d1f">
 </head>
 <body>
 <div class="wrap">
@@ -139,5 +143,8 @@ $("btnFetch").onclick = async () => {
   }
 };
 </script>
+
+<footer class="bangees-more" style="margin-top:44px;background:#081226;color:#e8eefc;padding:22px 16px 26px;text-align:center;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;"><div style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#8fb4ff;margin-bottom:9px;">More from Bangees</div><nav style="font-size:14.5px;line-height:2;"><a href="https://iambangees.github.io/agent-roll-call/" style="color:#cfe0ff;text-decoration:none;">Agent Roll Call</a> · <a href="https://iambangees.github.io/name-atlas/" style="color:#cfe0ff;text-decoration:none;">Name Atlas</a> · <a href="https://iambangees.github.io/naira-lens/" style="color:#cfe0ff;text-decoration:none;">Naira Lens</a> · <a href="https://iambangees.github.io/aeris/" style="color:#cfe0ff;text-decoration:none;">Aeris</a> · <a href="https://iambangees.github.io/memelab/" style="color:#cfe0ff;text-decoration:none;">MemeLab</a> · <a href="https://iambangees.github.io/pic-to-draw/" style="color:#cfe0ff;text-decoration:none;">PicToDraw</a> · <a href="https://iambangees.github.io/agent-cards/" style="color:#cfe0ff;text-decoration:none;">Agent Cards</a> · <a href="https://iambangees.github.io/claim-checker/" style="color:#cfe0ff;text-decoration:none;">Claim Checker</a> · <a href="https://iambangees.github.io/bet-diary/" style="color:#cfe0ff;text-decoration:none;">Bet Diary</a> · <a href="https://discaro.vercel.app" style="color:#cfe0ff;text-decoration:none;">Discaro</a></nav></footer>
+<script>if ("serviceWorker" in navigator) { navigator.serviceWorker.register("sw.js").catch(function(){}); }</script>
 </body>
 </html>
